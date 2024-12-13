@@ -47,3 +47,11 @@ val darkBlue = Color(0xFF3D5F92)
 
 val lightGrey = Color(0xFFF1F2F2)
 val darkGrey = Color(0xFF7F8286)
+
+val LightBlueBackground = Color(0xFFE1F5FE)
+val SoftWhiteCard = Color(0xFFFFFFFF)
+val SoftGrayBorder = Color(0xFFE0E0E0)
+val DarkTextColor = Color(0xFF212121)
+val LightTextColor = Color(0xFF757575)
+val AccentColor = Color(0xFFFF7043) // Coral
+val AccentTealColor = Color(0xFF1DE9B6) // Teal

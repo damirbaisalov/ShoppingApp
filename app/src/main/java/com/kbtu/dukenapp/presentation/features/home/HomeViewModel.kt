@@ -1,38 +1,59 @@
 package com.kbtu.dukenapp.presentation.features.home
 
-import androidx.lifecycle.viewModelScope
-import com.kbtu.dukenapp.domain.network.toResourceUiState
-import com.kbtu.dukenapp.domain.use_case.GetCharactersUseCase
-import com.kbtu.dukenapp.presentation.model.ResourceUiState
+import com.kbtu.dukenapp.presentation.features.home.mvi.Action
+import com.kbtu.dukenapp.presentation.features.home.mvi.Effect
+import com.kbtu.dukenapp.presentation.features.home.mvi.Intent
+import com.kbtu.dukenapp.presentation.features.home.mvi.Reducer
+import com.kbtu.dukenapp.presentation.features.home.mvi.State
 import com.kbtu.dukenapp.presentation.mvi.BaseViewModel
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val getCharactersUseCase: GetCharactersUseCase
-) :
-    BaseViewModel<HomeContract.State, HomeContract.Event, HomeContract.Effect>() {
+    private val homeInteractor: HomeInteractor
+) : BaseViewModel<State, Effect, Action, Reducer, HomeInteractor, >(State(), Reducer(), homeInteractor) {
 
     init {
-        getProducts()
+        viewModelScope.launch {
+            publishAction(Action.SetCategories(homeInteractor.loadCategories()))
+            publishAction(Action.SetScreenState(homeInteractor.loadScreen()))
+        }
     }
 
-    override fun createInitialState(): HomeContract.State =
-        HomeContract.State(
-            productList = ResourceUiState.Idle
-        )
+    fun performIntent(intent: Intent) {
+        when (intent) {
+            is Intent.OnRefreshClick -> refreshScreen()
+            is Intent.OnAddToCartClick -> onAddToCartClick(intent.productId)
+            is Intent.OnCategoryClick -> onCategoryClick(intent.categoryId)
+            is Intent.OnProductClick -> onProductClick(intent.productId)
+            is Intent.OnProfileClick -> onProfileClick()
+            is Intent.OnShoppingCartClick -> onShoppingCartClick()
+        }
+    }
 
-    override fun handleEvent(event: HomeContract.Event) {}
+    private fun onCategoryClick(categoryId: Int) {
 
+    }
 
-    private fun getProducts() {
-        setState { copy(productList = ResourceUiState.Loading) }
+    private fun onProductClick(productId: Int) {
+        homeInteractor.navigateToProductScreen(productId)
+    }
+
+    private fun onAddToCartClick(productId: Int) {
+
+    }
+
+    private fun onProfileClick() {
+
+    }
+
+    private fun onShoppingCartClick() {
+
+    }
+
+    private fun refreshScreen() {
         viewModelScope.launch {
-            val result = getCharactersUseCase()
-            setState {
-                copy(
-                    productList = result.toResourceUiState()
-                )
-            }
+            publishAction(Action.SetLoadingState(true))
+            publishAction(Action.SetScreenState(homeInteractor.loadScreen()))
         }
     }
 }

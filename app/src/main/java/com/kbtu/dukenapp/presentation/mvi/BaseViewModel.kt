@@ -1,74 +1,86 @@
 package com.kbtu.dukenapp.presentation.mvi
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.channels.Channel
+import com.common.mvi.BaseAction
+import com.common.mvi.BaseEffect
+import com.common.mvi.BaseReducer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlin.properties.Delegates
+import kotlinx.coroutines.withContext
 
-abstract class BaseViewModel<State : UiState, Event : UiEvent, Effect : UiEffect> :
-    ViewModel() {
+abstract class BaseViewModel<S : BaseState,
+        E : BaseEffect,
+        A : BaseAction,
+        RD : BaseReducer<S, A>,
+        I : BaseInteractor<*>
+        >
+    (
+    viewState: S,
+    private val reducer: RD,
+    protected val interactor: I
+) {
 
-    private val initState: State by lazy { createInitialState() }
+    private val coroutineScopeContainer: CoroutineScopeContainer =
+        interactor as CoroutineScopeContainer
+    private val _sideEffect = MutableSharedFlow<E>(1, 1)
+    private val _state = MutableStateFlow(viewState)
 
-    abstract fun createInitialState(): State
+    val state: StateFlow<S> = _state
+    val sideEffect: SharedFlow<E> = _sideEffect
 
-    val currentState: State
-        get() = uiState.value
+    private var onClearedCallback: (() -> Unit)? = null
+    private var exitHandler: MutableStateFlow<Boolean>? = null
+    private var onExit: (() -> Unit)? = null
 
-    private val _uiState: MutableStateFlow<State> = MutableStateFlow(initState)
-    val uiState = _uiState.asStateFlow()
+    private val _stateUpdatesFlow = MutableSharedFlow<A>(
+        extraBufferCapacity = Int.MAX_VALUE,
+        onBufferOverflow = BufferOverflow.DROP_LATEST,
+        replay = 10
+    )
 
-    private val _event: MutableSharedFlow<Event> = MutableSharedFlow()
-    private val event = _event.asSharedFlow()
-
-    private val _effect: Channel<Effect> = Channel()
-    val effect = _effect.receiveAsFlow()
-
+    protected val viewModelScope: CoroutineScope = coroutineScopeContainer.coroutineScope
 
     init {
-        subscribeEvents()
+        launchStateUpdatesFlow()
     }
 
-    private fun subscribeEvents() {
-        viewModelScope.launch {
-            event.collect {
-                handleEvent(it)
-            }
+    fun getExitHandler(): MutableStateFlow<Boolean> = exitHandler!!
+
+    fun getExitAction() = onExit!!
+
+    fun attachUiExitAttributes(exitHandler: MutableStateFlow<Boolean>, onExit: () -> Unit) {
+        this.exitHandler = exitHandler
+        this.onExit = onExit
+    }
+
+    open fun onCleared() {
+        onClearedCallback?.invoke()
+        coroutineScopeContainer.onCleared()
+    }
+
+    protected fun publishAction(action: A) {
+        _stateUpdatesFlow.tryEmit(action)
+    }
+
+    protected fun publishEffect(newEffect: E) = viewModelScope.launch {
+        _sideEffect.emit(newEffect)
+    }
+
+    @PublishedApi
+    internal fun doOnCleared(onCleared: () -> Unit) {
+        this.onClearedCallback = onCleared
+    }
+
+    private fun launchStateUpdatesFlow() = _stateUpdatesFlow.onEach { updateAction ->
+        withContext(Dispatchers.Default) {
+            _state.value = reducer.reduce(_state.value, updateAction)
         }
-    }
-
-
-    var state by Delegates.observable(initState) { _, oldValue, newValue ->
-        if (oldValue == newValue)
-            return@observable
-
-        viewModelScope.launch {
-            _uiState.update {
-                newValue
-            }
-        }
-    }
-
-    fun setEvent(action: Event) {
-        viewModelScope.launch { _event.emit(action) }
-    }
-
-    protected abstract fun handleEvent(event: Event)
-
-
-    protected fun setState(reduce: State.() -> State) {
-        state = currentState.reduce()
-    }
-
-    protected fun setEffect(builder: () -> Effect) {
-        val effectValue = builder()
-        viewModelScope.launch { _effect.send(effectValue) }
-    }
+    }.launchIn(viewModelScope)
 }

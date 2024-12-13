@@ -2,11 +2,10 @@ package com.kbtu.dukenapp.utils
 
 import android.app.Application
 import com.kbtu.dukenapp.di.mapperModule
+import com.kbtu.dukenapp.di.navigationModule
 import com.kbtu.dukenapp.di.networkModule
 import com.kbtu.dukenapp.di.persistenceModule
 import com.kbtu.dukenapp.di.repositoryModule
-import com.kbtu.dukenapp.di.useCasesModule
-import com.kbtu.dukenapp.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -18,12 +17,11 @@ class StoreApplication : Application() {
         startKoin {
             androidContext(this@StoreApplication)
             modules(
+                navigationModule,
                 repositoryModule,
-                useCasesModule,
-                viewModelModule,
                 networkModule,
                 mapperModule,
-                persistenceModule
+                persistenceModule,
             )
         }
     }

@@ -1,8 +1,14 @@
 package com.kbtu.dukenapp.domain.repository
 
-import com.kbtu.dukenapp.domain.model.characters.ProductItem
-import com.kbtu.dukenapp.domain.network.Response
+import com.kbtu.dukenapp.data.model.ResponseResult
+import com.kbtu.dukenapp.data.model.products.CategoryApiModel
+import com.kbtu.dukenapp.data.model.products.ProductItemApiModel
 
 interface OnlineStoreRepository {
-    suspend fun getCharacters(): Response<List<ProductItem>>
+
+    suspend fun loadProducts(): ResponseResult<List<ProductItemApiModel>>
+
+    suspend fun loadCategories(): List<CategoryApiModel>
+
+    suspend fun loadProduct(id: Int): ProductItemApiModel
 }

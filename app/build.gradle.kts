@@ -63,9 +63,14 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.coil)
+    implementation(libs.coil.compose)
+    implementation(libs.accompanist.swiperefresh)
+    implementation(libs.accompanist.pager)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.brick)
 
     // Testing
     testImplementation(libs.junit)
