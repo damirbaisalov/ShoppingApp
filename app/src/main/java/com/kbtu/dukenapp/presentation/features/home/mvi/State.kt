@@ -7,7 +7,9 @@ import com.kbtu.dukenapp.presentation.mvi.BaseState
 data class State(
     val screenState: ScreenState = ScreenState.Loading,
     val isLoading: Boolean = true,
-    val categories: List<CategoryUiModel> = emptyList()
+    val categories: List<CategoryUiModel> = emptyList(),
+    val products: List<ProductUiModel> = emptyList(),
+    val cart: List<ProductUiModel> = emptyList()
 ) : BaseState()
 
 sealed class ScreenState {

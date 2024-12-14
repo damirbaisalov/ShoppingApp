@@ -55,12 +55,11 @@ fun ProductDetailsScreen(
                 TopAppBar(
                     modifier = Modifier.height(56.dp),
                     navigationIcon = {
-                        // Back button in the app bar
                         IconButton(onClick = { performIntent(Intent.OnExitClick) }) {
                             Icon(
                                 imageVector = Icons.Filled.ArrowBack,
                                 contentDescription = "Back",
-                                modifier = Modifier.size(24.dp) // Adjust icon size if necessary
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     },

@@ -5,7 +5,10 @@ import com.kbtu.dukenapp.presentation.features.home.mvi.Effect
 import com.kbtu.dukenapp.presentation.features.home.mvi.Intent
 import com.kbtu.dukenapp.presentation.features.home.mvi.Reducer
 import com.kbtu.dukenapp.presentation.features.home.mvi.State
+import com.kbtu.dukenapp.presentation.model.ProductUiModel
 import com.kbtu.dukenapp.presentation.mvi.BaseViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -17,12 +20,17 @@ class HomeViewModel(
             publishAction(Action.SetCategories(homeInteractor.loadCategories()))
             publishAction(Action.SetScreenState(homeInteractor.loadScreen()))
         }
+
+        homeInteractor.cartItems.onEach {
+            publishAction(Action.SetCartItems(it))
+        }.launchIn(viewModelScope)
     }
 
     fun performIntent(intent: Intent) {
         when (intent) {
             is Intent.OnRefreshClick -> refreshScreen()
-            is Intent.OnAddToCartClick -> onAddToCartClick(intent.productId)
+            is Intent.OnAddToCartClick -> onAddToCartClick(intent.product)
+            is Intent.OnRemoveFromCartClick -> onRemoveFromCartClick(intent.product)
             is Intent.OnCategoryClick -> onCategoryClick(intent.categoryId)
             is Intent.OnProductClick -> onProductClick(intent.productId)
             is Intent.OnProfileClick -> onProfileClick()
@@ -31,15 +39,11 @@ class HomeViewModel(
     }
 
     private fun onCategoryClick(categoryId: Int) {
-
+        publishAction(Action.SetCategorySelection(categoryId))
     }
 
     private fun onProductClick(productId: Int) {
         homeInteractor.navigateToProductScreen(productId)
-    }
-
-    private fun onAddToCartClick(productId: Int) {
-
     }
 
     private fun onProfileClick() {
@@ -53,7 +57,21 @@ class HomeViewModel(
     private fun refreshScreen() {
         viewModelScope.launch {
             publishAction(Action.SetLoadingState(true))
-            publishAction(Action.SetScreenState(homeInteractor.loadScreen()))
+            val screenState = homeInteractor.loadScreen()
+            publishAction(Action.SetScreenState(screenState))
+            publishAction(Action.SetCategories(homeInteractor.loadCategories()))
+        }
+    }
+
+    private fun onAddToCartClick(product: ProductUiModel) {
+        viewModelScope.launch {
+            homeInteractor.addProductToCart(product)
+        }
+    }
+
+    private fun onRemoveFromCartClick(product: ProductUiModel) {
+        viewModelScope.launch {
+            homeInteractor.removeProductFromCart(product)
         }
     }
 }

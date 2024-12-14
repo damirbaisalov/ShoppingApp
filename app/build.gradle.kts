@@ -67,10 +67,12 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.accompanist.swiperefresh)
     implementation(libs.accompanist.pager)
+    implementation(libs.material.icons.extended)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
     implementation(libs.brick)
+    implementation(libs.litert.support.api)
 
     // Testing
     testImplementation(libs.junit)

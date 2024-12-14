@@ -17,8 +17,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +44,7 @@ import com.kbtu.dukenapp.ui.theme.AccentTealColor
 import com.kbtu.dukenapp.ui.theme.SoftGrayBorder
 import com.kbtu.dukenapp.ui.theme.SoftWhiteCard
 import com.kbtu.dukenapp.ui.theme.black
+import com.kbtu.dukenapp.ui.theme.gray
 
 @Composable
 fun ProductListScreen(products: List<ProductUiModel>, performIntent: (Intent) -> Unit) {
@@ -46,16 +54,26 @@ fun ProductListScreen(products: List<ProductUiModel>, performIntent: (Intent) ->
             .padding(horizontal = 16.dp)
     ) {
         items(products) { product ->
-            ProductItem(product = product) {
-                performIntent.invoke(Intent.OnProductClick(productId = product.productId))
-            }
+            ProductItem(
+                product = product,
+                onProductClick = { performIntent(Intent.OnProductClick(product.productId)) },
+                onAddToCart = { performIntent(Intent.OnAddToCartClick(product)) },
+                onRemoveFromCart = { performIntent(Intent.OnRemoveFromCartClick(product)) },
+                cartCount = product.count
+            )
         }
     }
 }
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun ProductItem(product: ProductUiModel, onProductClick: () -> Unit) {
+fun ProductItem(
+    product: ProductUiModel,
+    onProductClick: () -> Unit,
+    onAddToCart: (ProductUiModel) -> Unit,
+    onRemoveFromCart: (ProductUiModel) -> Unit,
+    cartCount: Int
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -72,9 +90,8 @@ fun ProductItem(product: ProductUiModel, onProductClick: () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             val pagerState = rememberPagerState()
-
             HorizontalPager(
-                count = product.images.size, // Number of images
+                count = product.images.size,
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -107,24 +124,68 @@ fun ProductItem(product: ProductUiModel, onProductClick: () -> Unit) {
                     text = product.name.trim(),
                     color = black
                 )
-//                Spacer(modifier = Modifier.height(4.dp))
-//                Text(text = product.description, style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "$${product.price}",
                     color = Color.Black
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (cartCount == 0) {
+                    Button(
+                        onClick = { onAddToCart(product) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Add to Cart")
+                    }
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = { onRemoveFromCart(product) },
+                            colors = IconButtonDefaults.iconButtonColors(contentColor = gray)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Remove,
+                                contentDescription = "Remove from Cart",
+                                tint = gray
+                            )
+                        }
+
+                        Text(
+                            text = "$cartCount",
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            color = Color.Black
+                        )
+
+                        IconButton(
+                            onClick = { onAddToCart(product) },
+                            colors = IconButtonDefaults.iconButtonColors(contentColor = gray)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add to Cart",
+                                tint = gray
+                            )
+                        }
+                    }
+
+                }
             }
         }
     }
 }
+
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun DotsIndicator(
     pagerState: com.google.accompanist.pager.PagerState,
     modifier: Modifier = Modifier,
-    activeColor: Color = AccentTealColor, // Use Accent Teal Color for active dots
+    activeColor: Color = AccentTealColor,
     inactiveColor: Color = SoftGrayBorder
 ) {
     val dotSize = 8.dp

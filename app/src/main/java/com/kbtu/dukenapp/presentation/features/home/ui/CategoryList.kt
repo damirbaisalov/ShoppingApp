@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import com.kbtu.dukenapp.presentation.features.home.mvi.Intent
 import com.kbtu.dukenapp.presentation.model.CategoryUiModel
 import com.kbtu.dukenapp.ui.theme.black
+import com.kbtu.dukenapp.ui.theme.gray
+import com.kbtu.dukenapp.ui.theme.white
 
 @Composable
 fun CategoryList(categories: List<CategoryUiModel>, performIntent: (Intent) -> Unit) {
@@ -41,13 +43,13 @@ fun CategoryChip(category: CategoryUiModel, onCategoryClick: () -> Unit) {
         onClick = { onCategoryClick() },
         modifier = Modifier
             .padding(end = 8.dp)
-            .height(48.dp),
+            .height(32.dp),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = Color.White,
-            contentColor = black
+            containerColor = if (category.isSelected) gray else Color.White,
+            contentColor =  if (category.isSelected) white else black
         ),
         border = BorderStroke(1.dp, LightGray)
     ) {
-        Text(text = category.name, style = MaterialTheme.typography.bodyMedium)
+        Text(text = category.name, style = MaterialTheme.typography.bodySmall)
     }
 }

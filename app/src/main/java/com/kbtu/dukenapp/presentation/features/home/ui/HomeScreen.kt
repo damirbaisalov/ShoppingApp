@@ -68,9 +68,6 @@ fun HomeScreen(state: State, performIntent: (Intent) -> Unit) {
                     )
                 )
             },
-            bottomBar = {
-
-            }
         ) { paddingValues ->
             Column(
                 modifier = Modifier

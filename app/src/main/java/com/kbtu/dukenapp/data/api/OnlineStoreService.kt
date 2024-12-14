@@ -16,4 +16,7 @@ interface OnlineStoreService {
 
     @GET("categories")
     suspend fun getCategories(): List<CategoryApiModel>
+
+    @GET("products/?categoryId={id}")
+    suspend fun filterByCategory(@Path("id") id: Int): List<ProductItemApiModel>
 }
