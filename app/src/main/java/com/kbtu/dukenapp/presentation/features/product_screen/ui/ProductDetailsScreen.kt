@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -76,18 +75,6 @@ fun ProductDetailsScreen(
                             ),
                             modifier = Modifier.padding(start = 8.dp)
                         )
-                    },
-                    actions = {
-                        IconButton(
-                            modifier = Modifier.padding(end = 16.dp),
-                            onClick = { performIntent(Intent.OnProfileClick) }) {
-                            Icon(
-                                imageVector = Icons.Filled.AccountCircle,
-                                contentDescription = "Account",
-                                modifier = Modifier
-                                    .size(40.dp)
-                            )
-                        }
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = LightBlueBackground,

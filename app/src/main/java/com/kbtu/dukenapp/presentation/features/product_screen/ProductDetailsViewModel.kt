@@ -26,31 +26,8 @@ class ProductDetailsViewModel(
     fun performIntent(intent: Intent) {
         when (intent) {
             is Intent.OnRefreshClick -> refreshScreen()
-            is Intent.OnAddToCartClick -> onAddToCartClick(intent.productId)
-            is Intent.OnProfileClick -> onProfileClick()
-            is Intent.OnShoppingCartClick -> onShoppingCartClick()
             is Intent.OnExitClick -> productDetailsInteractor.exit()
         }
-    }
-
-    private fun onCategoryClick(categoryId: Int) {
-
-    }
-
-    private fun onProductClick(productId: Int) {
-//        homeInteractor.navigateToProductScreen(productId)
-    }
-
-    private fun onAddToCartClick(productId: Int) {
-
-    }
-
-    private fun onProfileClick() {
-
-    }
-
-    private fun onShoppingCartClick() {
-
     }
 
     private fun refreshScreen() {
