@@ -61,6 +61,12 @@ class CartViewModel(
     }
 
     private fun navigateToCheckout() {
-        interactor.navigateToCheckoutScreen()
+        viewModelScope.launch {
+            cartInteractor.createOrder(
+                state.value.totalPrice,
+                onSuccess = { publishEffect(Effect.ShowSuccessToast) },
+                onError = { publishEffect(Effect.ShowErrorToast(it))}
+            )
+        }
     }
 }

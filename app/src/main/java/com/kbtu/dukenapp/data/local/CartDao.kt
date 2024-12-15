@@ -30,6 +30,9 @@ interface CartDao {
     @Query("UPDATE cart_items SET count = :quantity WHERE product_id = :productId")
     suspend fun updateCartItemQuantity(productId: Int, quantity: Int)
 
+    @Query("DELETE FROM cart_items")
+    suspend fun clearAllCartItems()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCartItem(cartItem: CartItemDBModel)
 

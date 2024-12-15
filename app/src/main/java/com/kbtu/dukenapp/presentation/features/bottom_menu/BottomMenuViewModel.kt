@@ -1,11 +1,12 @@
 package com.kbtu.dukenapp.presentation.features.bottom_menu
 
 import com.alphicc.brick.TreeRouter
-import com.kbtu.dukenapp.component3
 import com.kbtu.dukenapp.presentation.features.cart.implementation.CartRouterImpl
 import com.kbtu.dukenapp.presentation.features.cart.implementation.cartComponent
 import com.kbtu.dukenapp.presentation.features.home.implementation.HomeRouterImpl
 import com.kbtu.dukenapp.presentation.features.home.implementation.homeComponent
+import com.kbtu.dukenapp.presentation.features.profile.implementation.ProfileRouterImpl
+import com.kbtu.dukenapp.presentation.features.profile.implementation.profileComponent
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class BottomMenuViewModel(val router: TreeRouter) {
@@ -22,7 +23,8 @@ class BottomMenuViewModel(val router: TreeRouter) {
         }
     private val thirdMenuRouter =
         router.branch(bottomMenuScreen.key).apply {
-            addComponent(component3, this)
+            val profileArgument = ProfileRouterImpl.Args()
+            addComponent(profileComponent, profileArgument)
         }
 
     val startScreenIndex: MutableStateFlow<Int> = MutableStateFlow(0)

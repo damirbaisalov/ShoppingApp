@@ -28,10 +28,48 @@ class AuthTokenRepositoryImpl(context: Context) :
         return sharedPreferences.getInt(AUTH_TOKEN, 0) != 0
     }
 
+    // Check if the user is logged in
+    override fun isLoggedIn(): Boolean {
+        return sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false)
+    }
+
+    // Set the logged-in state
+    override fun setLoggedIn(isLoggedIn: Boolean, accessToken: String, userId: Int) {
+        sharedPreferences.edit().apply {
+            putBoolean(KEY_IS_LOGGED_IN, isLoggedIn)
+            putString(KEY_ACCESS_TOKEN, accessToken)
+            putInt(KEY_USER_ID, userId)
+            apply()
+        }
+    }
+
+    // Get the stored access token
+    override fun getAccessToken(): String? {
+        return sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
+    }
+
+    // Get the stored user ID
+    override fun getUserId(): Int {
+        return sharedPreferences.getInt(KEY_USER_ID, -1)
+    }
+
+    // Log out the user
+    override fun logout() {
+        sharedPreferences.edit().apply {
+            putBoolean(KEY_IS_LOGGED_IN, false)
+            putString(KEY_ACCESS_TOKEN, null)
+            putInt(KEY_USER_ID, -1)
+            apply()
+        }
+    }
+
     companion object {
         private const val AUTH_TOKEN: String = "AUTH_TOKEN"
         private const val PREFERENCES_NAME: String = "OnlineStorePref"
 
+        private const val KEY_IS_LOGGED_IN = "is_logged_in"
+        private const val KEY_ACCESS_TOKEN = "access_token"
+        private const val KEY_USER_ID = "user_id"
     }
 }
 

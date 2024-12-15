@@ -1,6 +1,8 @@
 package com.kbtu.dukenapp.presentation.features.cart.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,32 +19,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.kbtu.dukenapp.presentation.features.cart.mvi.Effect
 import com.kbtu.dukenapp.presentation.features.cart.mvi.Intent
 import com.kbtu.dukenapp.presentation.features.cart.mvi.State
 import com.kbtu.dukenapp.presentation.model.ProductUiModel
 import com.kbtu.dukenapp.ui.theme.LightBlueBackground
 import com.kbtu.dukenapp.ui.theme.black
+import com.kbtu.dukenapp.utils.extension.CollectAsSideEffect
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun CartScreen(
     state: State,
-    performIntent: (Intent) -> Unit
+    performIntent: (Intent) -> Unit,
+    sideEffect: SharedFlow<Effect>
 ) {
+    val context = LocalContext.current
+    sideEffect.CollectAsSideEffect {
+        when (it) {
+            is Effect.ShowSuccessToast -> {
+                Toast.makeText(context, "Successfully created order", Toast.LENGTH_SHORT).show()
+            }
+            is Effect.ShowErrorToast -> {
+                Toast.makeText(context, "You have to Sign In to create order", Toast.LENGTH_SHORT).show()
+
+            }
+        }
+    }
     Scaffold(
-        topBar = {
-//            TopAppBar(
-//                title = { Text("Shopping Cart", style = MaterialTheme.typography.h6) },
-//                backgroundColor = MaterialTheme.colors.primarySurface,
-//                actions = {
-//                    IconButton(onClick = { /* Handle Cart Actions */ }) {
-//                        Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "Cart")
-//                    }
-//                }
-//            )
-        },
         containerColor = LightBlueBackground,
         contentColor = LightBlueBackground,
     ) { paddingValues ->
@@ -55,33 +63,32 @@ fun CartScreen(
             if (state.cart.isEmpty()) {
                 EmptyCartView()
             } else {
-                CartItemList(
-                    cartItems = state.cart,
-                    onIncreaseQuantity = { product ->
-                        performIntent(
-                            Intent.OnIncreaseQuantity(
-                                product
-                            )
-                        )
-                    },
-                    onDecreaseQuantity = { product ->
-                        performIntent(
-                            Intent.OnDecreaseQuantity(
-                                product
-                            )
-                        )
-                    },
-                    onRemoveFromCart = { product ->
-                        performIntent(
-                            Intent.OnRemoveFromCartClick(
-                                product
-                            )
+                LazyColumn(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    items(state.cart) { product ->
+                        CartItemRow (
+                            product = product,
+                            onIncreaseQuantity = {
+                                performIntent(Intent.OnIncreaseQuantity(product))
+                            },
+                            onDecreaseQuantity = {
+                                performIntent(Intent.OnDecreaseQuantity(product))
+                            },
+                            onRemoveFromCart = {
+                                performIntent(Intent.OnRemoveFromCartClick(product))
+                            },
+                            onProductClick = {
+                                performIntent(Intent.OnProductClick(it))
+                            }
                         )
                     }
+                }
+                TotalAmount(totalPrice = state.totalPrice)
+                CreateOrderButton(
+                    hasItemsInCart = state.cart.isNotEmpty(),
+                    onCheckoutClick = { performIntent(Intent.OnCheckoutClick) }
                 )
-                Spacer(modifier = Modifier.weight(1f))
-                TotalAmount(cartItems = state.cart)
-                ProceedToCheckoutButton(onCheckoutClick = { performIntent(Intent.OnCheckoutClick) })
             }
         }
     }
@@ -112,32 +119,12 @@ fun EmptyCartView() {
 }
 
 @Composable
-fun CartItemList(
-    cartItems: List<ProductUiModel>,
-    onIncreaseQuantity: (ProductUiModel) -> Unit,
-    onDecreaseQuantity: (ProductUiModel) -> Unit,
-    onRemoveFromCart: (ProductUiModel) -> Unit
-) {
-    LazyColumn(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()) {
-        items(cartItems) { product ->
-            CartItemRow(
-                product = product,
-                onIncreaseQuantity = onIncreaseQuantity,
-                onDecreaseQuantity = onDecreaseQuantity,
-                onRemoveFromCart = onRemoveFromCart
-            )
-        }
-    }
-}
-
-@Composable
 fun CartItemRow(
     product: ProductUiModel,
     onIncreaseQuantity: (ProductUiModel) -> Unit,
     onDecreaseQuantity: (ProductUiModel) -> Unit,
-    onRemoveFromCart: (ProductUiModel) -> Unit
+    onRemoveFromCart: (ProductUiModel) -> Unit,
+    onProductClick: (Int) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -156,7 +143,8 @@ fun CartItemRow(
                 contentDescription = product.name,
                 modifier = Modifier
                     .size(80.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { onProductClick(product.productId) },
                 contentScale = ContentScale.Crop
             )
 
@@ -217,8 +205,7 @@ fun CartItemRow(
 }
 
 @Composable
-fun TotalAmount(cartItems: List<ProductUiModel>) {
-    val totalAmount = cartItems.sumOf { it.price * it.count }
+fun TotalAmount(totalPrice: Double) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -230,7 +217,7 @@ fun TotalAmount(cartItems: List<ProductUiModel>) {
             color = Color.Black
         )
         Text(
-            text = "$${"%.2f".format(totalAmount)}",
+            text = "$${"%.2f".format(totalPrice)}",
             style = MaterialTheme.typography.bodyLarge,
             color = black
         )
@@ -238,14 +225,15 @@ fun TotalAmount(cartItems: List<ProductUiModel>) {
 }
 
 @Composable
-fun ProceedToCheckoutButton(onCheckoutClick: () -> Unit) {
+fun CreateOrderButton(hasItemsInCart: Boolean, onCheckoutClick: () -> Unit) {
     Spacer(modifier = Modifier.height(16.dp))
     Button(
+        enabled = hasItemsInCart,
         onClick = onCheckoutClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text = "Proceed to Checkout")
+        Text(text = "Create order")
     }
 }
 

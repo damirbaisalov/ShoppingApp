@@ -28,7 +28,6 @@ import com.kbtu.dukenapp.presentation.features.home.mvi.ScreenState
 import com.kbtu.dukenapp.presentation.features.home.mvi.State
 import com.kbtu.dukenapp.ui.theme.LightBlueBackground
 import com.kbtu.dukenapp.ui.theme.black
-import com.kbtu.dukenapp.ui.theme.green3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

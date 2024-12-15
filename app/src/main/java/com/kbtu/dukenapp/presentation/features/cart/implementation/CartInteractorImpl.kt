@@ -1,6 +1,7 @@
 package com.kbtu.dukenapp.presentation.features.cart.implementation
 
 import com.kbtu.dukenapp.data.model.products.toCartItemDBModel
+import com.kbtu.dukenapp.domain.repository.AuthTokenRepository
 import com.kbtu.dukenapp.domain.repository.OnlineStoreRepository
 import com.kbtu.dukenapp.presentation.features.cart.CartInteractor
 import com.kbtu.dukenapp.presentation.features.cart.CartRouter
@@ -10,7 +11,8 @@ import kotlinx.coroutines.flow.Flow
 
 class CartInteractorImpl(
     val router: CartRouter,
-    val repository: OnlineStoreRepository
+    val repository: OnlineStoreRepository,
+    private val authTokenRepository: AuthTokenRepository
 ) : CartInteractor, CoroutineScopeContainer() {
 
     override val cartsFlow: Flow<List<ProductUiModel>> = repository.cartItemsFlow
@@ -23,8 +25,12 @@ class CartInteractorImpl(
         router.navigateToProductScreen(productId)
     }
 
-    override fun navigateToCheckoutScreen() {
-        router.navigateToCheckoutScreen()
+    override suspend fun createOrder(
+        totalPrice: Double,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        repository.createOrder(authTokenRepository.getUserId(), totalPrice, onSuccess, onError)
     }
 
     override suspend fun addProductToCart(product: ProductUiModel) {

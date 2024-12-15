@@ -29,7 +29,7 @@ abstract class BaseViewModel<S : BaseState,
 
     private val coroutineScopeContainer: CoroutineScopeContainer =
         interactor as CoroutineScopeContainer
-    private val _sideEffect = MutableSharedFlow<E>(1, 1)
+    private val _sideEffect = MutableSharedFlow<E>(0, 1)
     private val _state = MutableStateFlow(viewState)
 
     val state: StateFlow<S> = _state

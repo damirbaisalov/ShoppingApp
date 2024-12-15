@@ -19,4 +19,11 @@ interface OnlineStoreRepository {
     suspend fun removeProductFromCart(cartItem: CartItemDBModel)
     suspend fun deleteProductFromCart(cartItem: CartItemDBModel)
     suspend fun getCartItems(): List<CartItemDBModel>
+
+    suspend fun createOrder(
+        userId: Int,
+        totalPrice: Double,
+        successResult: () -> Unit,
+        errorResult: (String) -> Unit
+    )
 }

@@ -1,6 +1,7 @@
 package com.kbtu.dukenapp.di
 
 import com.kbtu.dukenapp.data.api.OnlineStoreService
+import com.kbtu.dukenapp.data.api.UserService
 import com.kbtu.dukenapp.utils.Constants.BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -11,7 +12,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 val networkModule = module {
     singleOf(::provideHttpClient)
-    singleOf(::provideSearchLocationService)
+    singleOf(::provideOnlineStoreService)
+    singleOf(::provideUserService)
 }
 
 fun provideHttpClient(): Retrofit {
@@ -28,6 +30,10 @@ fun provideHttpClient(): Retrofit {
         .build()
 }
 
-fun provideSearchLocationService(retrofit: Retrofit): OnlineStoreService {
+fun provideOnlineStoreService(retrofit: Retrofit): OnlineStoreService {
     return retrofit.create(OnlineStoreService::class.java)
+}
+
+fun provideUserService(retrofit: Retrofit): UserService {
+    return retrofit.create(UserService::class.java)
 }

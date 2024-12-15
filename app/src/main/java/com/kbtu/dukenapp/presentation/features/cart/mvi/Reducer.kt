@@ -6,6 +6,8 @@ class Reducer : BaseReducer<State, Action>() {
 
     override fun reduce(state: State, action: Action): State =
         when (action) {
-            is Action.SetCart -> state.copy(cart = action.cart)
+            is Action.SetCart -> state.copy(
+                cart = action.cart,
+                totalPrice = action.cart.sumOf { it.price * it.count })
         }
 }
