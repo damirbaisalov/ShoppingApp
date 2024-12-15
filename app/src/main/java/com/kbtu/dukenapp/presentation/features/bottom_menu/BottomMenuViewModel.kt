@@ -1,9 +1,9 @@
 package com.kbtu.dukenapp.presentation.features.bottom_menu
 
 import com.alphicc.brick.TreeRouter
-import com.kbtu.dukenapp.component1
-import com.kbtu.dukenapp.component2
 import com.kbtu.dukenapp.component3
+import com.kbtu.dukenapp.presentation.features.cart.implementation.CartRouterImpl
+import com.kbtu.dukenapp.presentation.features.cart.implementation.cartComponent
 import com.kbtu.dukenapp.presentation.features.home.implementation.HomeRouterImpl
 import com.kbtu.dukenapp.presentation.features.home.implementation.homeComponent
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,8 @@ class BottomMenuViewModel(val router: TreeRouter) {
         }
     private val secondMenuRouter =
         router.branch(bottomMenuScreen.key).apply {
-            addComponent(component2)
+            val cartArgument = CartRouterImpl.Args()
+            addComponent(cartComponent, cartArgument)
         }
     private val thirdMenuRouter =
         router.branch(bottomMenuScreen.key).apply {

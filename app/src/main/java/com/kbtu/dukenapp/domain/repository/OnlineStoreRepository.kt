@@ -17,5 +17,6 @@ interface OnlineStoreRepository {
 
     suspend fun addProductToCart(cartItem: CartItemDBModel)
     suspend fun removeProductFromCart(cartItem: CartItemDBModel)
+    suspend fun deleteProductFromCart(cartItem: CartItemDBModel)
     suspend fun getCartItems(): List<CartItemDBModel>
 }

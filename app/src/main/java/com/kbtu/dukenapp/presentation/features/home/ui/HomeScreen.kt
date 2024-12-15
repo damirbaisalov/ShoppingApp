@@ -1,5 +1,6 @@
 package com.kbtu.dukenapp.presentation.features.home.ui
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -27,6 +28,7 @@ import com.kbtu.dukenapp.presentation.features.home.mvi.ScreenState
 import com.kbtu.dukenapp.presentation.features.home.mvi.State
 import com.kbtu.dukenapp.ui.theme.LightBlueBackground
 import com.kbtu.dukenapp.ui.theme.black
+import com.kbtu.dukenapp.ui.theme.green3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,13 +42,12 @@ fun HomeScreen(state: State, performIntent: (Intent) -> Unit) {
             containerColor = LightBlueBackground,
             topBar = {
                 TopAppBar(
-                    modifier = Modifier.height(56.dp),
                     title = {
                         Text(
                             text = "E-Shop",
                             style = TextStyle(
                                 fontFamily = FontFamily.SansSerif,
-                                fontSize = 28.sp,
+                                fontSize = 24.sp,
                                 color = black,
                                 fontWeight = FontWeight.Bold
                             ),
@@ -54,11 +55,13 @@ fun HomeScreen(state: State, performIntent: (Intent) -> Unit) {
                         )
                     },
                     actions = {
-                        IconButton(onClick = { performIntent(Intent.OnProfileClick) }) {
+                        IconButton(
+                            modifier = Modifier.padding(end = 16.dp),
+                            onClick = { performIntent(Intent.OnProfileClick) }) {
                             Icon(
                                 imageVector = Icons.Filled.AccountCircle,
                                 contentDescription = "Account",
-                                modifier = Modifier.size(80.dp)
+                                modifier = Modifier.size(40.dp)
                             )
                         }
                     },

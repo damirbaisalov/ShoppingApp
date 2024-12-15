@@ -84,7 +84,19 @@ class OnlineStoreRepositoryImpl(
         }
     }
 
-    // Get all cart items from the database
+    override suspend fun deleteProductFromCart(cartItem: CartItemDBModel) {
+        try {
+            withContext(Dispatchers.IO) {
+                val existingProduct = cartDao.getCartItemByProductId(cartItem.productId)
+                existingProduct?.let {
+                    cartDao.deleteCartItem(existingProduct)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     override suspend fun getCartItems(): List<CartItemDBModel> {
         return try {
             withContext(Dispatchers.IO) {

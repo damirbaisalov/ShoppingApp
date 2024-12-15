@@ -18,24 +18,11 @@ import com.kbtu.dukenapp.ui.theme.white
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.ui.unit.dp
 import com.alphicc.brick.Component
 import com.kbtu.dukenapp.presentation.features.bottom_menu.bottomMenuScreen
 import com.kbtu.dukenapp.presentation.features.home.implementation.HomeRouterImpl
 import org.koin.android.ext.android.inject
-
-val component1 by lazy {
-    Component<Unit>(
-        key = "CompositeScreenInternal 1",
-        content = { _, _ -> Text("CompositeScreenInternal 1") }
-    )
-}
-
-val component2 by lazy {
-    Component<Unit>(
-        key = "CompositeScreenInternal 2",
-        content = { _, _ -> Text("CompositeScreenInternal 2") }
-    )
-}
 
 val component3 by lazy {
     Component<Unit>(
@@ -53,7 +40,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         val router: TreeRouter by inject<TreeRouter>()
 
         if (router.currentComponentKey() == null) {
@@ -68,7 +55,7 @@ class MainActivity : ComponentActivity() {
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
+//                    .padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
             ) {
                 AndroidComponentsContainer(
                     containerConnector = router,
