@@ -44,7 +44,9 @@ class UserRepositoryImpl(
     override suspend fun loadUserFromDb(userId: Int): UserUiModel? {
         return try {
             withContext(Dispatchers.IO) {
-                userDao.getUserById(userId)?.toUiModel()
+                val user = userDao.getUserById(userId)
+                user?.let { setCurrentUser(it.id) }
+                user?.toUiModel()
             }
         } catch (e: Exception) {
             e.printStackTrace()
