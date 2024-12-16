@@ -1,6 +1,5 @@
 package com.kbtu.dukenapp.presentation.features.home.ui
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle

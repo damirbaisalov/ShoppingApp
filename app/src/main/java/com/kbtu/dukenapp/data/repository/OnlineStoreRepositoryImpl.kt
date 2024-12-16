@@ -1,8 +1,5 @@
 package com.kbtu.dukenapp.data.repository
 
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import com.kbtu.dukenapp.data.api.OnlineStoreService
 import com.kbtu.dukenapp.data.local.CartDao
 import com.kbtu.dukenapp.data.local.OrderDao
@@ -129,11 +126,6 @@ class OnlineStoreRepositoryImpl(
     ) {
         try {
             withContext(Dispatchers.IO) {
-                // Check if the user exists
-                val users = userDao.getAllUsers()
-                Log.d("TEST_USERS", "createOrder: users -> $users")
-                Log.d("TEST_USERS", "createOrder: userId -> $userId")
-
                 val user = userDao.getUserById(userId)
                 if (user == null) {
                     errorResult("User with id $userId does not exist")
@@ -146,14 +138,13 @@ class OnlineStoreRepositoryImpl(
                 val randomStatus = statuses[Random.nextInt(statuses.size)]
 
                 val orderDbModel = OrderDBModel(
-                    userId = user.id, // from current user
+                    userId = user.id,
                     status = randomStatus,
                     totalPrice = totalPrice,
                     createdDate = getCurrentDate(),
                     productIds = productIds.joinToString(separator = ",")
                 )
 
-                // Insert the order and clear the cart
                 orderDao.insertOrder(orderDbModel)
                 cartDao.clearAllCartItems()
                 successResult()

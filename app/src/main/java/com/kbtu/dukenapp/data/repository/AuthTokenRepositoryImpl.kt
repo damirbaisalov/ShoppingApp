@@ -14,7 +14,7 @@ class AuthTokenRepositoryImpl(context: Context) :
     override fun getAuthToken(): Int {
         return sharedPreferences.getInt(AUTH_TOKEN, 0)
     }
-
+ 
     override fun storeAuthToken(token: Int) {
         editor.putInt(AUTH_TOKEN, token)
         editor.apply()
@@ -33,7 +33,6 @@ class AuthTokenRepositoryImpl(context: Context) :
         return sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false)
     }
 
-    // Set the logged-in state
     override fun setLoggedIn(isLoggedIn: Boolean, accessToken: String, userId: Int) {
         sharedPreferences.edit().apply {
             putBoolean(KEY_IS_LOGGED_IN, isLoggedIn)
@@ -43,17 +42,14 @@ class AuthTokenRepositoryImpl(context: Context) :
         }
     }
 
-    // Get the stored access token
     override fun getAccessToken(): String? {
         return sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
     }
 
-    // Get the stored user ID
     override fun getUserId(): Int {
         return sharedPreferences.getInt(KEY_USER_ID, -1)
     }
 
-    // Log out the user
     override fun logout() {
         sharedPreferences.edit().apply {
             putBoolean(KEY_IS_LOGGED_IN, false)

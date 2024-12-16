@@ -6,7 +6,7 @@ import com.kbtu.dukenapp.presentation.mvi.BaseState
 
 data class State(
     val screenState: ProfileScreenState = ProfileScreenState.AuthorizedScreen,
-    val user: UserUiModel = UserUiModel.empty(),
+    val user: UserUiModel? = null,
     val orderHistory: List<OrderUiModel> = emptyList()
 ): BaseState()
 

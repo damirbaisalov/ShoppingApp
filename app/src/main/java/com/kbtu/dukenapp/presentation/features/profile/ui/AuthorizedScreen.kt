@@ -113,7 +113,7 @@ fun AuthorizedScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = rememberAsyncImagePainter(state.user.avatar),
+            painter = rememberAsyncImagePainter(state.user?.avatar),
             contentDescription = "Profile Picture",
             modifier = Modifier
                 .size(120.dp)
@@ -124,7 +124,7 @@ fun AuthorizedScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = state.user.name,
+            text = state.user?.name.orEmpty(),
             style = TextStyle(
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -133,7 +133,7 @@ fun AuthorizedScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = state.user.email,
+            text = state.user?.email.orEmpty(),
             style = TextStyle(
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onBackground

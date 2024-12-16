@@ -34,14 +34,15 @@ fun BottomMenuScreen(
     onSecondMenuClicked: () -> Unit,
     onThirdMenuClicked: () -> Unit
 ) {
-
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .padding(bottom = 78.dp)
                 .fillMaxSize()
         ) {
-            AndroidComponentsContainer(containerRouter)
+            AndroidComponentsContainer(containerRouter) {
+                containerRouter.parentRouter?.cleanRouter()
+            }
         }
 
         Row(
@@ -53,34 +54,24 @@ fun BottomMenuScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             BottomNavigationBar(
+                defaultIndex = defaultIndex,
                 onHomeScreenClicked = onFirstMenuClicked,
                 onNavigateToCategories = onSecondMenuClicked,
                 onNavigateToProfile = onThirdMenuClicked
             )
-//            Button(onClick = onFirstMenuClicked) {
-//                Text(text = "Menu1", color = if (defaultIndex == 0) black else gray)
-//            }
-//
-//            Button(onClick = onSecondMenuClicked) {
-//                Text(text = "Menu2", color = if (defaultIndex == 1) black else gray)
-//            }
-//
-//            Button(onClick = onThirdMenuClicked) {
-//                Text(text = "Menu3", color = if (defaultIndex == 2) black else gray)
-//            }
         }
     }
 }
 
 @Composable
 fun BottomNavigationBar(
+    defaultIndex: Int,
     onHomeScreenClicked: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToCategories: () -> Unit
 ) {
     NavigationBar(
-        modifier = Modifier
-            .wrapContentHeight(),
+        modifier = Modifier.wrapContentHeight(),
         containerColor = LightBlueBackground
     ) {
         NavigationBarItem(
@@ -91,7 +82,7 @@ fun BottomNavigationBar(
                 )
             },
             label = { Text("Home") },
-            selected = false,
+            selected = defaultIndex == 0,
             onClick = { onHomeScreenClicked() }
         )
         NavigationBarItem(
@@ -102,7 +93,7 @@ fun BottomNavigationBar(
                 )
             },
             label = { Text("Cart") },
-            selected = false,
+            selected = defaultIndex == 1,
             onClick = { onNavigateToCategories() }
         )
         NavigationBarItem(
@@ -113,7 +104,7 @@ fun BottomNavigationBar(
                 )
             },
             label = { Text("Profile") },
-            selected = false,
+            selected = defaultIndex == 2,
             onClick = { onNavigateToProfile() }
         )
     }

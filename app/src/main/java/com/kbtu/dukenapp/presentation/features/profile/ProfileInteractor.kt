@@ -11,7 +11,7 @@ interface ProfileInteractor : BaseInteractor<ProfileRouter> {
 
     fun logout()
 
-    suspend fun getCurrentUser(): UserUiModel
+    suspend fun getCurrentUser(): UserUiModel?
 
     suspend fun signIn(
         email: String,

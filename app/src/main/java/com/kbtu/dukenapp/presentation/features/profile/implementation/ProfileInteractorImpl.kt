@@ -1,6 +1,7 @@
 package com.kbtu.dukenapp.presentation.features.profile.implementation
 
 import com.kbtu.dukenapp.data.model.ResponseResult
+import com.kbtu.dukenapp.data.model.orders.toOrderUiModel
 import com.kbtu.dukenapp.data.model.user.CreateUserRequest
 import com.kbtu.dukenapp.data.model.user.UserRequestApiModel
 import com.kbtu.dukenapp.data.model.user.toUserUiModel
@@ -8,12 +9,14 @@ import com.kbtu.dukenapp.domain.repository.AuthTokenRepository
 import com.kbtu.dukenapp.domain.repository.UserRepository
 import com.kbtu.dukenapp.presentation.features.profile.ProfileInteractor
 import com.kbtu.dukenapp.presentation.features.profile.ProfileRouter
-import com.kbtu.dukenapp.presentation.features.profile.mvi.ProfileScreenState
 import com.kbtu.dukenapp.presentation.model.OrderUiModel
 import com.kbtu.dukenapp.presentation.model.UserUiModel
 import com.kbtu.dukenapp.presentation.model.toUiModel
 import com.kbtu.dukenapp.presentation.mvi.CoroutineScopeContainer
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 
 class ProfileInteractorImpl(
     val router: ProfileRouter,
@@ -22,12 +25,14 @@ class ProfileInteractorImpl(
 ) : ProfileInteractor, CoroutineScopeContainer() {
 
     override val ordersFlow: Flow<List<OrderUiModel>> = repository.ordersFlow
+        .map { orders -> orders.map { it.toOrderUiModel() } }
+        .flowOn(Dispatchers.Default)
 
     override fun logout() {
         authTokenRepository.logout()
     }
 
-    override suspend fun getCurrentUser(): UserUiModel {
+    override suspend fun getCurrentUser(): UserUiModel? {
         val userId = authTokenRepository.getUserId()
         val userUiModel = repository.loadUserFromDb(userId)
 
@@ -71,8 +76,7 @@ class ProfileInteractorImpl(
                 password = password,
                 avatar = "https://picsum.photos/800"
             )
-            val responseResult = repository.createUser(userCreateUserRequest)
-            when (responseResult) {
+            when (val responseResult = repository.createUser(userCreateUserRequest)) {
                 is ResponseResult.Error -> onError(
                     responseResult.exception.message ?: "Something went wrong"
                 )
@@ -83,33 +87,7 @@ class ProfileInteractorImpl(
                 }
             }
         } catch (e: Exception) {
-
+            onError(e.message ?: "Something went wrong")
         }
     }
-
-//    override val cartsFlow: Flow<List<ProductUiModel>> = repository.cartItemsFlow
-
-//    override fun exit() {
-//        router.exit()
-//    }
-
-//    override fun navigateToProductScreen(productId: Int) {
-//        router.navigateToProductScreen(productId)
-//    }
-//
-//    override fun navigateToCheckoutScreen() {
-//        router.navigateToCheckoutScreen()
-//    }
-//
-//    override suspend fun addProductToCart(product: ProductUiModel) {
-//        repository.addProductToCart(product.toCartItemDBModel())
-//    }
-//
-//    override suspend fun removeProductFromCart(product: ProductUiModel) {
-//        repository.removeProductFromCart(product.toCartItemDBModel())
-//    }
-//
-//    override suspend fun deleteProductFromCart(product: ProductUiModel) {
-//        repository.deleteProductFromCart(product.toCartItemDBModel())
-//    }
 }

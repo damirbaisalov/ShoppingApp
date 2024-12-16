@@ -19,7 +19,6 @@ val bottomMenuScreen by lazy {
             val viewModel = dataContainer.get<BottomMenuViewModel>()
             val defaultIndex by viewModel.startScreenIndex.collectAsState()
             val containerRouter by viewModel.containerRouter.collectAsState()
-
             BottomMenuScreen(
                 defaultIndex,
                 containerRouter,

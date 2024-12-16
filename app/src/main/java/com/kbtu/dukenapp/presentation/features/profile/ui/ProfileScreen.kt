@@ -4,7 +4,6 @@ import SignInScreen
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.kbtu.dukenapp.data.model.orders.OrderStatus
 import com.kbtu.dukenapp.presentation.features.profile.mvi.Effect
 import com.kbtu.dukenapp.presentation.features.profile.mvi.Intent
 import com.kbtu.dukenapp.presentation.features.profile.mvi.ProfileScreenState

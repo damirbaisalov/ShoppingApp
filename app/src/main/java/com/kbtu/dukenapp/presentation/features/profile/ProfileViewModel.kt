@@ -61,7 +61,10 @@ class ProfileViewModel(
                 name = name,
                 email = email,
                 password = password,
-                onSuccess = { publishAction(Action.SetUser(it)) },
+                onSuccess = {
+                    publishEffect(Effect.ShowToast("Successfully created account"))
+                    publishAction(Action.SetScreenState(ProfileScreenState.SignIn))
+                },
                 onError = { publishEffect(Effect.ShowToast(it)) }
             )
         }

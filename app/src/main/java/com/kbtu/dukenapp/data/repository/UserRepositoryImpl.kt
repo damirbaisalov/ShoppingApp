@@ -4,7 +4,7 @@ import com.kbtu.dukenapp.data.api.UserService
 import com.kbtu.dukenapp.data.local.OrderDao
 import com.kbtu.dukenapp.data.local.UserDao
 import com.kbtu.dukenapp.data.model.ResponseResult
-import com.kbtu.dukenapp.data.model.orders.toOrderUiModel
+import com.kbtu.dukenapp.data.model.orders.OrderDBModel
 import com.kbtu.dukenapp.data.model.user.CreateUserRequest
 import com.kbtu.dukenapp.data.model.user.CreateUserResponse
 import com.kbtu.dukenapp.data.model.user.UserApiModel
@@ -12,13 +12,14 @@ import com.kbtu.dukenapp.data.model.user.UserDBModel
 import com.kbtu.dukenapp.data.model.user.UserRequestApiModel
 import com.kbtu.dukenapp.data.model.user.toUserApiModel
 import com.kbtu.dukenapp.domain.repository.UserRepository
-import com.kbtu.dukenapp.presentation.model.OrderUiModel
 import com.kbtu.dukenapp.presentation.model.UserUiModel
 import com.kbtu.dukenapp.presentation.model.toUiModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.withContext
 
 class UserRepositoryImpl(
@@ -27,18 +28,27 @@ class UserRepositoryImpl(
     private val orderDao: OrderDao,
 ) : UserRepository {
 
-    override val ordersFlow: Flow<List<OrderUiModel>> = orderDao.getOrdersFlow()
-        .map { orders -> orders.map { it.toOrderUiModel() } }
-        .flowOn(Dispatchers.Default)
+    private val currentUserId = MutableStateFlow<Int?>(null)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override val ordersFlow: Flow<List<OrderDBModel>> = currentUserId
+        .filterNotNull()
+        .flatMapLatest { userId ->
+            orderDao.getOrdersByUserIdFlow(userId)
+        }
 
-    override suspend fun loadUserFromDb(userId: Int): UserUiModel {
+    private fun setCurrentUser(userId: Int) {
+        currentUserId.value = userId
+    }
+
+    override suspend fun loadUserFromDb(userId: Int): UserUiModel? {
         return try {
             withContext(Dispatchers.IO) {
-                return@withContext userDao.getUserById(userId)?.toUiModel() ?: UserUiModel.empty()
+                userDao.getUserById(userId)?.toUiModel()
             }
         } catch (e: Exception) {
-            UserUiModel.empty()
+            e.printStackTrace()
+            null
         }
     }
 
@@ -48,15 +58,20 @@ class UserRepositoryImpl(
                 val loginResult = userService.login(userRequestApiModel)
                 val userApiModelResult =
                     userService.getProfile(accessToken = "Bearer ${loginResult.accessToken}")
-                userDao.insertUser(
-                    UserDBModel(
-                        userIdFromNetwork = userApiModelResult.id,
-                        avatar = userApiModelResult.avatar,
-                        name = userApiModelResult.name,
-                        password = userApiModelResult.password,
-                        email = userApiModelResult.email
+                val user = userDao.getAllUsers().find { it.userIdFromNetwork == userApiModelResult.id }
+                if (user == null) {
+                    userDao.insertUser(
+                        UserDBModel(
+                            userIdFromNetwork = userApiModelResult.id,
+                            avatar = userApiModelResult.avatar,
+                            name = userApiModelResult.name,
+                            password = userApiModelResult.password,
+                            email = userApiModelResult.email
+                        )
                     )
-                )
+                }
+                val insertedUser = userDao.getUserById(userApiModelResult.id)
+                insertedUser?.let { setCurrentUser(it.id) }
                 return@withContext ResponseResult.Success(
                     userApiModelResult.toUserApiModel(
                         loginResult
