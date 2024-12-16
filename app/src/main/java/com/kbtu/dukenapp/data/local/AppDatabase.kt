@@ -12,7 +12,6 @@ import com.kbtu.dukenapp.data.model.user.UserDBModel
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun onlineStoreDao(): AuthorizationDao
     abstract fun cartDao(): CartDao
     abstract fun userDao(): UserDao
     abstract fun orderDao(): OrderDao

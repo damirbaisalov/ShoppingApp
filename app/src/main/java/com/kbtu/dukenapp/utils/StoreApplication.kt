@@ -1,7 +1,6 @@
 package com.kbtu.dukenapp.utils
 
 import android.app.Application
-import com.kbtu.dukenapp.di.mapperModule
 import com.kbtu.dukenapp.di.navigationModule
 import com.kbtu.dukenapp.di.networkModule
 import com.kbtu.dukenapp.di.persistenceModule
@@ -20,7 +19,6 @@ class StoreApplication : Application() {
                 navigationModule,
                 repositoryModule,
                 networkModule,
-                mapperModule,
                 persistenceModule,
             )
         }
