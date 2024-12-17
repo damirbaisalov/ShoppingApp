@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.kbtu.dukenapp.presentation.features.cart.mvi.Effect
@@ -150,55 +151,61 @@ fun CartItemRow(
 
             Spacer(modifier = Modifier.width(16.dp))
 
+
             Column(
-                modifier = Modifier.weight(1f)
+                horizontalAlignment = Alignment.Start
             ) {
-                Text(
-                    text = product.name,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "$${product.price}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = { onDecreaseQuantity(product) }) {
-                    Icon(
-                        imageVector = Icons.Default.Remove,
-                        contentDescription = "Decrease Quantity",
-                        tint = Color.Gray
+                Column (
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = product.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "$${product.price}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
-                Text(
-                    text = "${product.count}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                IconButton(onClick = { onIncreaseQuantity(product) }) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Increase Quantity",
-                        tint = Color.Gray
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    IconButton(onClick = { onDecreaseQuantity(product) }) {
+                        Icon(
+                            imageVector = Icons.Default.Remove,
+                            contentDescription = "Decrease Quantity",
+                            tint = Color.Gray
+                        )
+                    }
+                    Text(
+                        text = "${product.count}",
+                        style = MaterialTheme.typography.bodySmall
                     )
+                    IconButton(onClick = { onIncreaseQuantity(product) }) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Increase Quantity",
+                            tint = Color.Gray
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    IconButton(onClick = { onRemoveFromCart(product) }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Remove from Cart",
+                            tint = Color.Red
+                        )
+                    }
                 }
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            IconButton(onClick = { onRemoveFromCart(product) }) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Remove from Cart",
-                    tint = Color.Red
-                )
             }
         }
     }
