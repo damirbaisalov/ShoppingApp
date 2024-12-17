@@ -11,7 +11,6 @@ import com.alphicc.brick.TreeRouter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.kbtu.dukenapp.ui.theme.white
 import androidx.compose.animation.ExperimentalAnimationApi
-import com.kbtu.dukenapp.di.provideRouter
 import com.kbtu.dukenapp.presentation.features.bottom_menu.bottomMenuScreen
 import org.koin.android.ext.android.inject
 

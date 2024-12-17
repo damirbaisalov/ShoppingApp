@@ -45,7 +45,12 @@ class HomeInteractorImpl(
 
 
     override suspend fun loadCategories(): List<CategoryUiModel> {
-        return repository.loadCategories().map { it.toUiModel() }
+        return try {
+            repository.loadCategories().map { it.toUiModel() }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return emptyList()
+        }
     }
 
     override suspend fun addProductToCart(product: ProductUiModel) {
